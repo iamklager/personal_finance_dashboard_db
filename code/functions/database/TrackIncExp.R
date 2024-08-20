@@ -6,7 +6,7 @@ TrackIncExp <- function(conn, table_name, date, amount, product, source, categor
     conn = conn,
     statement = paste0("
     insert into ", table_name, "
-    values ('", date, "', ", amount, ", '", product, "', '", source, "', '", category, "');
+    values ('", format(date, "%Y-%m-%d"), "', ", amount, ", '", product, "', '", source, "', '", category, "');
     ")
   )
 }

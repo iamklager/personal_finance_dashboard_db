@@ -39,6 +39,12 @@ ui <- navbarPage(
         max       = Sys.Date(),
         format    = "yy/mm/dd"
       )
+    ),
+    
+    
+    downloadButton(
+      outputId = "out_Download",
+      label = "Download .csv"
     )
   ),
   
@@ -71,66 +77,78 @@ ui <- navbarPage(
       
       nav_panel(
         title = "Income",
-        DT::DTOutput("out_DTIncExp"),
         div(
-          style = "display: flex; gap: 20px;",
+          style = "display: block;",
+          DT::DTOutput("out_DTIncExp")
+        ),
+        div(
+          style = "display: inline-flex; border-width: thick; gap: 1.50%; justify-content: center; align-items: center;",
           dateInput(
             inputId = "in_DateIncome",
             label   = "Date",
             value   = Sys.Date(),
-            format  = "yy/mm/dd"
+            format  = "yy/mm/dd",
+            width   = "8.70%"
           ),
           numericInput(
             inputId = "in_AmountIncome",
             label   = "Amount",
-            value   = 0,
-            min     = 0,
-            step    = 1
+            value   = 0.00,
+            min     = 0.00,
+            step    = 0.50,
+            width   = "8.70%"
           ),
           textInput(
             inputId     = "in_ProductIncome",
             label       = "Product",
             value       = "",
-            placeholder = "insert income name"
+            placeholder = "insert income name",
+            width       = "34.78%"
           ),
           textInput(
             inputId     = "in_SourceIncome",
             label       = "Source",
             value       = "",
-            placeholder = "insert income source"
+            placeholder = "insert income source",
+            width       = "13.04%"
           ),
           textInput(
             inputId     = "in_CategoryIncome",
             label       = "Category",
             value       = "",
-            placeholder = "insert income category"
+            placeholder = "insert income category",
+            width       = "13.04%"
+          ),
+          input_task_button(
+            id         = "in_TrackIncome",
+            label      = "Track",
+            label_busy = "Tracking income...",
+            auto_reset = TRUE, state = "ready",
+            style      = "width: 21.74%; height: 40px;"
           )
         ),
-        bslib::input_task_button(
-          id         = "in_TrackIncome",
-          label      = "Track",
-          label_busy = "Tracking income...",
-          auto_reset = FALSE, state = "ready"
-        ),
         div(
-          style = "display: flex; gap: 20px;",
+          style = "display: inline-flex; border-width: thick; gap: 1.50%; justify-content: center; align-items: center;",
           fileInput(
             inputId = "in_FileIncome",
             label   = "Income file",
             accept  = c(".csv", ".xlsx"),
-            placeholder = "Add .csv or .xlsx"
+            placeholder = "Add .csv or .xlsx",
+            width = "51.16%"
           ),
-          bslib::input_task_button(
+          input_task_button(
             id         = "in_AppendFileIncome",
             label      = "Append",
             label_busy = "Appending to income...",
-            auto_reset = FALSE, state = "ready"
+            auto_reset = TRUE, state = "ready",
+            style      = "width: 100%; height: 40px;"
           ),
-          bslib::input_task_button(
+          input_task_button(
             id         = "in_OverwriteFileIncome",
             label      = "Overwrite",
             label_busy = "Overwriting income...",
-            auto_reset = FALSE, state = "ready"
+            auto_reset = TRUE, state = "ready",
+            style      = "width: 100%; height: 40px;"
           )
         )
       )

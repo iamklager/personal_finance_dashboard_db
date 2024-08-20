@@ -1,10 +1,11 @@
 #### Main
 # Run this file to start the app.
-
+rm(list = ls())
 
 ### Libraries ----
 library(DBI)
 library(RSQLite)
+library(readxl)
 library(shiny)
 library(bslib)
 library(bsicons)
@@ -13,6 +14,7 @@ library(DT)
 
 ### Sourcing files ----
 source("code/database/db_setup.R")
+invisible(lapply(list.files("code/functions", pattern = ".R", full.names = T, recursive = T), function(file) { source(file) }))
 
 
 ### Server and UI ----
