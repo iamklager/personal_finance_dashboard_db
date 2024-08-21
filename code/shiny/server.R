@@ -120,7 +120,7 @@ server <- function(input, output, session) {
     )
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
   })
-  observeEvent(input$in_AppendFileExpenses, {
+  observeEvent(input$in_AppendFileAssets, {
     file <- input$in_FileAssets
     if (length(file) != 0) {
       ext <- tools::file_ext(file$name)
@@ -130,7 +130,7 @@ server <- function(input, output, session) {
       rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
     }
   })
-  observeEvent(input$in_OverwriteFileExpenses, {
+  observeEvent(input$in_OverwriteFileAssets, {
     file <- input$in_FileAssets
     if (length(file) != 0) {
       ext <- tools::file_ext(file$name)
@@ -183,17 +183,17 @@ server <- function(input, output, session) {
   output$out_DTAssets   <- DT::renderDT({ rv_Assets() })
   
   ## Income
-  output$out_hcIncomeCategory <- renderHighchart({ hcIncExpByCategory(rv_IncomeGroup()) })
-  output$out_hcIncomeMonth <- renderHighchart({ hcIncExpByMonth(rv_IncomeMonth(), input$in_ColorProfit) })
-  output$out_hcIncomeSource <- renderHighchart({ hcIncExpBySource(rv_IncomeGroup())})
+  output$out_hcIncomeCategory <- renderHighchart({ hcIncExpByCategory(rv_IncomeGroup(), input$in_DarkModeOn) })
+  output$out_hcIncomeMonth    <- renderHighchart({ hcIncExpByMonth(rv_IncomeMonth(), input$in_ColorProfit, input$in_DarkModeOn) })
+  output$out_hcIncomeSource   <- renderHighchart({ hcIncExpBySource(rv_IncomeGroup(), input$in_DarkModeOn)})
   
   ## Expenses
-  output$out_hcExpensesCategory <- renderHighchart({ hcIncExpByCategory(rv_ExpensesGroup()) })
-  output$out_hcExpensesMonth <- renderHighchart({ hcIncExpByMonth(rv_ExpensesMonth(), input$in_ColorLoss) })
-  output$out_hcExpensesSource <- renderHighchart({ hcIncExpBySource(rv_ExpensesGroup())})
+  output$out_hcExpensesCategory <- renderHighchart({ hcIncExpByCategory(rv_ExpensesGroup(), input$in_DarkModeOn) })
+  output$out_hcExpensesMonth    <- renderHighchart({ hcIncExpByMonth(rv_ExpensesMonth(), input$in_ColorLoss, input$in_DarkModeOn) })
+  output$out_hcExpensesSource   <- renderHighchart({ hcIncExpBySource(rv_ExpensesGroup(), input$in_DarkModeOn)})
   
   ## Assets
-  
+  output$out_hcPlaceHolder <- renderHighchart({})
   
 }
 

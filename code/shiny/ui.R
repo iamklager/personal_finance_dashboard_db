@@ -31,7 +31,8 @@ ui <- navbarPage(
         value     = Sys.Date(),
         min       = as.Date("1900-01-01", format = "%Y-%m-%d"),
         max       = Sys.Date(),
-        format    = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]]
+        format    = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]],
+        startview = "year"
       )
     ),
     downloadButton(
@@ -44,17 +45,18 @@ ui <- navbarPage(
   nav_panel(
     title = "Summary",
     layout_columns(
+      col_widths = c(6, 6),
       navset_card_underline(
         full_screen = FALSE,
         title       = "Profit/Loss (Total)",
         height      = "435px",
-        nav_panel(title = "")
+        nav_panel(title = "", highchartOutput("out_hcPlaceHolder", height = "100%"))
       ),
       navset_card_underline(
         full_screen = FALSE,
         title       = "Profit/Loss (As % of Income)",
         height      = "435px",
-        nav_panel(title = "")
+        nav_panel(title = "", highchartOutput("out_hcPlaceHolder", height = "100%"))
       )
     ),
     layout_columns(
@@ -62,18 +64,18 @@ ui <- navbarPage(
         full_screen = TRUE,
         title       = "Income, Expenses, and Investments",
         height      = "435px",
-        nav_panel(title = "")
+        nav_panel(title = "", highchartOutput("out_hcPlaceHolder", height = "100%"))
       ),
       navset_card_underline(
         full_screen = TRUE,
         title       = "Profit/Loss Over Time",
         height      = "435px",
-        nav_panel(title = "")
+        nav_panel(title = "", highchartOutput("out_hcPlaceHolder", height = "100%"))
       )
     )
   ),
-  
-  
+
+
   nav_panel(
     title = "Income",
     layout_columns(
@@ -97,8 +99,8 @@ ui <- navbarPage(
       nav_panel(title = "", highchartOutput("out_hcIncomeSource", height = "100%"))
     )
   ),
-  
-  
+
+
   nav_panel(
     title = "Expenses",
     layout_columns(
@@ -122,8 +124,8 @@ ui <- navbarPage(
       nav_panel(title = "", highchartOutput("out_hcExpensesSource", height = "100%"))
     )
   ),
-  
-  
+
+
   nav_panel(
     title = "Assets",
     layout_columns(
@@ -131,27 +133,27 @@ ui <- navbarPage(
         full_screen = TRUE,
         title       = "Asset allocation",
         height      = "435px",
-        nav_panel(title = "Current Value"),
-        nav_panel(title = "Acquisition Value")
+        nav_panel(title = "Current Value", highchartOutput("out_hcPlaceHolder", height = "100%")),
+        nav_panel(title = "Acquisition Value", highchartOutput("out_hcPlaceHolder", height = "100%"))
       ),
       navset_card_underline(
         full_screen = TRUE,
         title       = "Asset Gains",
         height      = "435px",
-        nav_panel(title = "Stocks"),
-        nav_panel(title = "Alternatives")
+        nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
+        nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
       )
     ),
     navset_card_underline(
       full_screen = TRUE,
       title       = "Asset Price Development",
       height      = "435px",
-      nav_panel(title = "Stocks"),
-      nav_panel(title = "Alternatives")
+      nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
+      nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
     )
   ),
-  
-  
+
+
   nav_panel(
     title = "Tracking",
     navset_card_underline(
@@ -162,14 +164,17 @@ ui <- navbarPage(
       nav_TrackAssets
     )
   ),
-  
+
   nav_panel(
     title = "Settings",
-    
+
     navset_card_underline(
       full_screen = FALSE,
       height = "885px",
       nav_Settings
     )
   )
+  
+  
 )
+
