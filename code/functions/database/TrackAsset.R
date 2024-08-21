@@ -10,13 +10,13 @@ TrackAsset <- function(
     statement = paste0("
     insert into assets
     values (
-      '", type ,"',
-      '", group ,"',
-      '", ticker_symbol ,"',
-      '", display_name ,"',
       '", date ,"',
+      '", display_name ,"',
       ", quantity ,",
       ", price_total ,",
+      '", ticker_symbol ,"',
+      '", type ,"',
+      '", group ,"',
       '", transaction_type ,"',
       '", transaction_currency ,"',
       '", source_currency ,"'

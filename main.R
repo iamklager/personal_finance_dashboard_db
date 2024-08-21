@@ -6,15 +6,18 @@ rm(list = ls())
 library(DBI)
 library(RSQLite)
 library(readxl)
+library(highcharter)
 library(shiny)
 library(bslib)
 library(bsicons)
 library(DT)
+library(colourpicker)
 
 
 ### Sourcing files ----
 source("code/database/db_setup.R")
 invisible(lapply(list.files("code/functions", pattern = ".R", full.names = T, recursive = T), function(file) { source(file) }))
+invisible(lapply(list.files("code/shiny/nav_panels", pattern = ".R", full.names = T, recursive = T), function(file) { source(file) }))
 
 
 ### Server and UI ----

@@ -11,25 +11,19 @@ ui <- navbarPage(
   ),
   title = "My Finances",
   windowTitle = "My Finances",
-  selected = "Tracking",
+  selected = "Income",
   lang = "en",
   
   sidebar = sidebar(
-    # switchInput(
-    #   inputId  = "input_DarkMode",
-    #   label    = "",
-    #   value    = c_DarkOnStart,
-    #   onLabel  = "light",
-    #   offLabel = "dark"
-    # )
     div(
       style = "display: flex; gap: 20px;",
       dateInput(
         inputId   = "in_DateFrom",
         label     = "From",
-        value     = paste0(substr(Sys.Date(), 1, 4), "-01-01"),
+        value     = dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]],
         min       = as.Date("1900-01-01", format = "%Y-%m-%d"),
-        format    = "yy/mm/dd"
+        format    = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]],
+        startview = "year"
       ),
       dateInput(
         inputId   = "in_DateTo",
@@ -37,11 +31,9 @@ ui <- navbarPage(
         value     = Sys.Date(),
         min       = as.Date("1900-01-01", format = "%Y-%m-%d"),
         max       = Sys.Date(),
-        format    = "yy/mm/dd"
+        format    = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]]
       )
     ),
-    
-    
     downloadButton(
       outputId = "out_Download",
       label = "Download .csv"
@@ -50,110 +42,134 @@ ui <- navbarPage(
   
   
   nav_panel(
-    title = "Summary"
+    title = "Summary",
+    layout_columns(
+      navset_card_underline(
+        full_screen = FALSE,
+        title       = "Profit/Loss (Total)",
+        height      = "435px",
+        nav_panel(title = "")
+      ),
+      navset_card_underline(
+        full_screen = FALSE,
+        title       = "Profit/Loss (As % of Income)",
+        height      = "435px",
+        nav_panel(title = "")
+      )
+    ),
+    layout_columns(
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Income, Expenses, and Investments",
+        height      = "435px",
+        nav_panel(title = "")
+      ),
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Profit/Loss Over Time",
+        height      = "435px",
+        nav_panel(title = "")
+      )
+    )
   ),
   
   
   nav_panel(
-    title = "Income"
+    title = "Income",
+    layout_columns(
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Income by Category",
+        height      = "435px",
+        nav_panel(title = "", highchartOutput("out_hcIncomeCategory", height = "100%"))
+      ),
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Income by Month",
+        height      = "435px",
+        nav_panel(title = "", highchartOutput("out_hcIncomeMonth", height = "100%"))
+      )
+    ),
+    navset_card_underline(
+      full_screen = TRUE,
+      title       = "Income by Source",
+      height      = "435px",
+      nav_panel(title = "", highchartOutput("out_hcIncomeSource", height = "100%"))
+    )
   ),
   
   
   nav_panel(
-    title = "Expenses"
+    title = "Expenses",
+    layout_columns(
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Expenses by Category",
+        height      = "435px",
+        nav_panel(title = "", highchartOutput("out_hcExpensesCategory", height = "100%"))
+      ),
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Expenses by Month",
+        height      = "435px",
+        nav_panel(title = "", highchartOutput("out_hcExpensesMonth", height = "100%"))
+      )
+    ),
+    navset_card_underline(
+      full_screen = TRUE,
+      title       = "Expenses by Source",
+      height      = "435px",
+      nav_panel(title = "", highchartOutput("out_hcExpensesSource", height = "100%"))
+    )
   ),
   
   
   nav_panel(
-    title = "Assets"
+    title = "Assets",
+    layout_columns(
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Asset allocation",
+        height      = "435px",
+        nav_panel(title = "Current Value"),
+        nav_panel(title = "Acquisition Value")
+      ),
+      navset_card_underline(
+        full_screen = TRUE,
+        title       = "Asset Gains",
+        height      = "435px",
+        nav_panel(title = "Stocks"),
+        nav_panel(title = "Alternatives")
+      )
+    ),
+    navset_card_underline(
+      full_screen = TRUE,
+      title       = "Asset Price Development",
+      height      = "435px",
+      nav_panel(title = "Stocks"),
+      nav_panel(title = "Alternatives")
+    )
   ),
   
   
   nav_panel(
     title = "Tracking",
+    navset_card_underline(
+      full_screen = FALSE,
+      height      = "885px",
+      nav_TrackIncome,
+      nav_TrackExpenses,
+      nav_TrackAssets
+    )
+  ),
+  
+  nav_panel(
+    title = "Settings",
     
     navset_card_underline(
-      full_screen = TRUE,
-      
-      nav_panel(
-        title = "Income",
-        div(
-          style = "display: block;",
-          DT::DTOutput("out_DTIncExp")
-        ),
-        div(
-          style = "display: inline-flex; border-width: thick; gap: 1.50%; justify-content: center; align-items: center;",
-          dateInput(
-            inputId = "in_DateIncome",
-            label   = "Date",
-            value   = Sys.Date(),
-            format  = "yy/mm/dd",
-            width   = "8.70%"
-          ),
-          numericInput(
-            inputId = "in_AmountIncome",
-            label   = "Amount",
-            value   = 0.00,
-            min     = 0.00,
-            step    = 0.50,
-            width   = "8.70%"
-          ),
-          textInput(
-            inputId     = "in_ProductIncome",
-            label       = "Product",
-            value       = "",
-            placeholder = "insert income name",
-            width       = "34.78%"
-          ),
-          textInput(
-            inputId     = "in_SourceIncome",
-            label       = "Source",
-            value       = "",
-            placeholder = "insert income source",
-            width       = "13.04%"
-          ),
-          textInput(
-            inputId     = "in_CategoryIncome",
-            label       = "Category",
-            value       = "",
-            placeholder = "insert income category",
-            width       = "13.04%"
-          ),
-          input_task_button(
-            id         = "in_TrackIncome",
-            label      = "Track",
-            label_busy = "Tracking income...",
-            auto_reset = TRUE, state = "ready",
-            style      = "width: 21.74%; height: 40px;"
-          )
-        ),
-        div(
-          style = "display: inline-flex; border-width: thick; gap: 1.50%; justify-content: center; align-items: center;",
-          fileInput(
-            inputId = "in_FileIncome",
-            label   = "Income file",
-            accept  = c(".csv", ".xlsx"),
-            placeholder = "Add .csv or .xlsx",
-            width = "51.16%"
-          ),
-          input_task_button(
-            id         = "in_AppendFileIncome",
-            label      = "Append",
-            label_busy = "Appending to income...",
-            auto_reset = TRUE, state = "ready",
-            style      = "width: 100%; height: 40px;"
-          ),
-          input_task_button(
-            id         = "in_OverwriteFileIncome",
-            label      = "Overwrite",
-            label_busy = "Overwriting income...",
-            auto_reset = TRUE, state = "ready",
-            style      = "width: 100%; height: 40px;"
-          )
-        )
-      )
-      
-      
+      full_screen = FALSE,
+      height = "885px",
+      nav_Settings
     )
   )
 )
