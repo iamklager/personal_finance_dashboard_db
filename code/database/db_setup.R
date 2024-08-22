@@ -77,6 +77,32 @@ dbSendQuery(
   "
 )
 
+### Currency stuff ----
+dbSendQuery(
+  conn      = dbConn, 
+  statement = "
+  create table if not exists currencies
+  (
+    Currency text not null
+  );
+  "
+)
+dbSendQuery(
+  conn = dbConn,
+  statement = "
+  insert into currencies (Currency)
+  select 'EUR'
+  where not exists (
+    select 1 from currencies
+  )
+  union all
+  select 'USD'
+  where not exists (
+    select 1 from currencies
+  );
+  "
+)
+
 
 ### Settings ----
 dbSendQuery(
@@ -88,7 +114,8 @@ dbSendQuery(
     ColorProfit not null,
     ColorLoss not null,
     DateFormat text not null,
-    DateFrom text not null
+    DateFrom text not null,
+    MainCurrency text not null
   );
   "
 )
@@ -96,7 +123,7 @@ dbSendQuery(
   conn = dbConn,
   statement = paste0("
   insert into settings
-  select 0, '#90ed7d', '#f45b5b', 'yyyy-mm-dd', '", format(Sys.Date(), "%Y"), "-01-01'
+  select 0, '#90ed7d', '#f45b5b', 'yyyy-mm-dd', '", format(Sys.Date(), "%Y"), "-01-01', 'EUR'
   where not exists (
     select 1 from settings
   );

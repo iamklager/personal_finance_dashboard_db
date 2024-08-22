@@ -55,6 +55,10 @@ server <- function(input, output, session) {
     rv_Income(QueryTableSimple(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    updateNumericInput(inputId = "in_AmountIncome", value = 0)
+    updateTextInput(inputId = "in_ProductIncome", value = "")
+    updateTextInput(inputId = "in_SourceIncome", value = "")
+    updateTextInput(inputId = "in_CategoryIncome", value = "")
   })
   observeEvent(input$in_AppendFileIncome, {
     file <- input$in_FileIncome
@@ -86,6 +90,10 @@ server <- function(input, output, session) {
     rv_Expenses(QueryTableSimple(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    updateNumericInput(inputId = "in_AmountExpenses", value = 0)
+    updateTextInput(inputId = "in_ProductExpenses", value = "")
+    updateTextInput(inputId = "in_SourceExpenses", value = "")
+    updateTextInput(inputId = "in_CategoryExpenses", value = "")
   })
   observeEvent(input$in_AppendFileExpenses, {
     file <- input$in_FileExpenses
@@ -119,6 +127,15 @@ server <- function(input, output, session) {
       input$in_TransCurrencyAsset, input$in_SourceCurrencyAsset
     )
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+    updateTextInput(inputId = "in_DisplayNameAsset", value = "")
+    updateNumericInput(inputId = "in_QuantityAsset", value = 0)
+    updateNumericInput(inputId = "in_PriceTotalAsset", value = 0)
+    updateTextInput(inputId = "in_TickerSymbolAsset", value = "")
+    updateTextInput(inputId = "in_TypeAsset", value = "")
+    updateTextInput(inputId = "in_GroupAsset", value = "")
+    updateTextInput(inputId = "in_TransTypeAsset", value = "")
+    updateTextInput(inputId = "in_TransCurrencyAsset", value = "")
+    updateTextInput(inputId = "in_SourceCurrencyAsset", value = "")
   })
   observeEvent(input$in_AppendFileAssets, {
     file <- input$in_FileAssets
@@ -159,6 +176,12 @@ server <- function(input, output, session) {
     rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+  })
+  observeEvent(input$in_EntireDateRange, {
+    updateDateInput(inputId = "in_DateFrom", value = FirstDate(dbConn))
+  })
+  observeEvent(input$in_YTD, {
+    updateDateInput(inputId = "in_DateFrom", value = dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]])
   })
   
   

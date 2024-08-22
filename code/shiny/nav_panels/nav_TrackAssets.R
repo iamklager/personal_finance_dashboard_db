@@ -11,7 +11,7 @@ nav_TrackAssets <- nav_panel(
       label   = "Date",
       value   = Sys.Date(),
       max     = Sys.Date(),
-      format  = "yy/mm/dd",
+      format  = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]],
       width   = "8.70%"
     ),
     textInput(
@@ -117,3 +117,4 @@ nav_TrackAssets <- nav_panel(
     )
   )
 )
+

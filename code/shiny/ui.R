@@ -35,6 +35,19 @@ ui <- navbarPage(
         startview = "year"
       )
     ),
+    div(
+      style = "display: flex; gap: 20px;",
+      actionButton(
+        inputId = "in_EntireDateRange",
+        label   = "All Time",
+        width   = "50%"
+      ),
+      actionButton(
+        inputId = "in_YTD",
+        label   = "YTD",
+        width   = "50%"
+      )
+    ),
     downloadButton(
       outputId = "out_Download",
       label = "Download .csv"

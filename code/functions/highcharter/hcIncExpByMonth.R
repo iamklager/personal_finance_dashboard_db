@@ -11,7 +11,7 @@ hcIncExpByMonth <- function(df, color = "limegreen", darkmode_on) {
     )
   }
   
-  res <-highchart2() |> 
+  res <- highchart2() |> 
     hc_plotOptions(column = list(borderWidth = 0, stacking = "normal")) |> 
     hc_xAxis(type = "category") |> 
     hc_yAxis(title = list(text = "Amount")) |> 

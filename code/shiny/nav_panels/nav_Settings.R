@@ -1,7 +1,7 @@
 nav_Settings <- nav_panel(
   title = "",
   div(
-    style = "display: inline-flex; border-width: thick; gap: 1.50%;",
+    style = "display: inline-flex; border-width: thick; gap: 1.50%; align-items: center;;",
     input_switch(
       id = "in_DarkModeOn",
       label = "Dark Mode",
@@ -32,7 +32,12 @@ nav_Settings <- nav_panel(
       label    = "Date format",
       choices  = c("yyyy-mm-dd", "mm/dd/yyyy", "dd.mm.yyyy"),
       selected = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]]
-      
+    ),
+    selectizeInput(
+      inputId  = "in_MainCurrency",
+      label    = "Currency",
+      choices  = dbGetQuery(dbConn, "select Currency from currencies;")[[1]]
     )
   )
 )
+
