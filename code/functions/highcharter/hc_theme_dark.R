@@ -8,20 +8,22 @@ hc_theme_dark <- function() {
     ),
     xAxis = list(
       gridLineColor = "#424549",
-      tickColor = "#424549",
-      lineColor = "#424549",
-      title = list(style = list(color = "#C0C0C0"))
+      tickColor     = "#424549",
+      lineColor     = "#424549",
+      title         = list(style = list(color = "#C0C0C0")),
+      labels        = list(style = list(color = "#808080"))
     ),
     yAxis = list(
       gridLineColor = "#424549",
-      tickColor = "#424549",
-      title = list(style = list(color = "#C0C0C0"))
+      tickColor     = "#424549",
+      title         = list(style = list(color = "#C0C0C0")),
+      labels        = list(style = list(color = "#808080"))
     ),
     title = list(style = list(color = "#C0C0C0")),
     subtitle = list(style = list(color = "#C0C0C0")),
     legend = list(
-      itemStyle = list(color = "#C0C0C0"),
-      itemHoverStyle = list(color = "#FFFFFF"),
+      itemStyle       = list(color = "#C0C0C0"),
+      itemHoverStyle  = list(color = "#FFFFFF"),
       itemHiddenStyle = list(color = "#444444")
     )
   )

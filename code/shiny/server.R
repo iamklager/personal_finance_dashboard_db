@@ -29,6 +29,7 @@ server <- function(input, output, session) {
   ## Periodically
   observeEvent(rv_Today(), {
     # Writing price data
+    QueryPrices(dbConn)
   })
   
   ## Settings
@@ -127,6 +128,7 @@ server <- function(input, output, session) {
       input$in_TransCurrencyAsset, input$in_SourceCurrencyAsset
     )
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+    QueryPrices(dbConn)
     updateTextInput(inputId = "in_DisplayNameAsset", value = "")
     updateNumericInput(inputId = "in_QuantityAsset", value = 0)
     updateNumericInput(inputId = "in_PriceTotalAsset", value = 0)
@@ -145,6 +147,7 @@ server <- function(input, output, session) {
       df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
       Append2Table(dbConn, "assets", df)
       rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+      QueryPrices(dbConn)
     }
   })
   observeEvent(input$in_OverwriteFileAssets, {
@@ -155,6 +158,7 @@ server <- function(input, output, session) {
       df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
       OverWriteTable(dbConn, "assets", df)
       rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+      QueryPrices(dbConn)
     }
   })
   

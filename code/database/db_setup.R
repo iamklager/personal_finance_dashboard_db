@@ -130,3 +130,21 @@ dbSendQuery(
   ")
 )
 
+
+### Views ----
+dbSendQuery(
+  conn = dbConn,
+  statement = "
+  CREATE VIEW IF NOT EXISTS vAssetsCumQuant AS
+  SELECT 
+  	Date,
+  	DisplayName, 
+  	TickerSymbol, 
+  	SUM(Quantity) OVER (
+  	  PARTITION BY TickerSymbol ORDER BY Date
+  	 ) AS QuantityCum
+  FROM assets
+  ORDER BY TickerSymbol, Date ASC;
+  "
+)
+
