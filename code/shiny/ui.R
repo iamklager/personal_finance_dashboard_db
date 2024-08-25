@@ -146,15 +146,15 @@ ui <- navbarPage(
         full_screen = TRUE,
         title       = "Asset allocation",
         height      = "435px",
-        nav_panel(title = "Current Value", highchartOutput("out_hcPlaceHolder", height = "100%")),
-        nav_panel(title = "Acquisition Value", highchartOutput("out_hcPlaceHolder", height = "100%"))
+        nav_panel(title = "Current Value", highchartOutput("out_hcAssetAllocCur", height = "100%")),
+        nav_panel(title = "Acquisition Value", highchartOutput("out_hcAssetAllocAcq", height = "100%"))
       ),
       navset_card_underline(
         full_screen = TRUE,
         title       = "Asset Gains",
         height      = "435px",
-        nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
-        nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
+        nav_panel(title = "Stocks", highchartOutput("out_hcAssetGainsStock", height = "100%")),
+        nav_panel(title = "Alternatives", highchartOutput("out_hcAssetGainsAlternative", height = "100%"))
       )
     ),
     navset_card_underline(

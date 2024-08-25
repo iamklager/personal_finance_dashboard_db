@@ -97,6 +97,7 @@ QueryPrices <- function(conn) {
                 from    = format(as.Date(last_date) + 1, "%Y-%m-%d"),
                 to      = transaction_dates[2]
               )
+              if ((index(prices)[nrow(prices)] == format(as.Date(last_date), "%Y-%m-%d"))) { return(NULL) }
             }, 
             error = function(cond) { NULL }
           )
@@ -111,6 +112,7 @@ QueryPrices <- function(conn) {
               Symbols = ticker_symbol, 
               from    = format(as.Date(last_date) + 1, "%Y-%m-%d")
             )
+            if ((index(prices)[nrow(prices)] == format(as.Date(last_date), "%Y-%m-%d"))) { return(NULL) }
           }, 
           error = function(cond) { NULL }
         )

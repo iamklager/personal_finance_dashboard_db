@@ -3,7 +3,7 @@
 
 
 ### Database ----
-dbConn <- dbConnect(SQLite(), "data/dbFinances")
+dbConn <- dbConnect(SQLite(), "data/dbFinances.sqlite3")
 
 
 ### Income ----
@@ -76,6 +76,24 @@ dbSendQuery(
   );
   "
 )
+# All xrates are based on USD. Hence, an entry where Currency = 'EUR' presents the xrate EUR/USD.
+dbSendQuery(
+  conn      = dbConn, 
+  statement = "
+  create table if not exists xrates
+  (
+    Date text not null,
+    Open real,
+    High real,
+    Low real,
+    Close real,
+    Volume real,
+    Adjusted real,
+    Currency text not null
+  );
+  "
+)
+
 
 ### Currency stuff ----
 dbSendQuery(
@@ -88,7 +106,7 @@ dbSendQuery(
   "
 )
 dbSendQuery(
-  conn = dbConn,
+  conn      = dbConn,
   statement = "
   insert into currencies (Currency)
   select 'EUR'
@@ -120,7 +138,7 @@ dbSendQuery(
   "
 )
 dbSendQuery(
-  conn = dbConn,
+  conn      = dbConn,
   statement = paste0("
   insert into settings
   select 0, '#90ed7d', '#f45b5b', 'yyyy-mm-dd', '", format(Sys.Date(), "%Y"), "-01-01', 'EUR'
@@ -132,19 +150,122 @@ dbSendQuery(
 
 
 ### Views ----
+# Cumulative assets
 dbSendQuery(
-  conn = dbConn,
+  conn      = dbConn,
   statement = "
   CREATE VIEW IF NOT EXISTS vAssetsCumQuant AS
   SELECT 
   	Date,
   	DisplayName, 
   	TickerSymbol, 
-  	SUM(Quantity) OVER (
-  	  PARTITION BY TickerSymbol ORDER BY Date
-  	 ) AS QuantityCum
+  	Type,
+  	[Group],
+    	SUM(
+  		CASE
+  			WHEN TransactionType = 'Buy' THEN Quantity
+  			ELSE -Quantity
+  		END
+  	) OVER (
+  		PARTITION BY
+  			TickerSymbol,
+  			Type,
+  			[Group]
+  		ORDER BY Date ASC
+  	) AS QuantityCum,
+  	TransactionCurrency,
+  	SourceCurrency
   FROM assets
-  ORDER BY TickerSymbol, Date ASC;
+  ORDER BY
+  Date ASC;
   "
 )
-
+# All Dates
+dbSendQuery(
+  conn      = dbConn,
+  statement = "
+  CREATE VIEW IF NOT EXISTS vAssetsAllDates AS
+  SELECT DISTINCT Date
+  FROM (
+  	SELECT Date FROM assets
+  	UNION
+  	SELECT Date FROM xrates
+  	UNION
+  	SELECT Date FROM price_data
+  )
+  WHERE Date >= (SELECT DATE(MIN(Date), '-7 day') FROM assets)
+  ORDER BY Date ASC;
+  "
+)
+# All xrates
+dbSendQuery(
+  conn      = dbConn,
+  statement = "
+  CREATE VIEW IF NOT EXISTS vAssetsXRates AS
+  WITH AllCombs AS (
+  	SELECT DISTINCT
+  		ad.Date,
+  		cr.Currency,
+  		xr.Adjusted
+  	FROM vAssetsAllDates ad
+  	CROSS JOIN (
+  		SELECT Currency
+  		FROM currencies
+  		WHERE Currency != 'USD'
+  	) cr
+  	LEFT JOIN xrates xr
+  		ON ad.Date = xr.Date
+  		AND cr.Currency = xr.Currency
+  )
+  SELECT
+  	Date,
+  	Currency,
+  	COALESCE (
+  		Adjusted,
+  		(
+  			SELECT ac2.Adjusted
+  			FROM AllCombs ac2
+  			WHERE ac2.Date < ac.Date
+  			AND ac2.Currency = ac.Currency
+        AND ac2.Adjusted IS NOT NULL
+  			ORDER BY ac2.Date DESC
+  			LIMIT 1
+  		)
+  	) AS XRate
+  FROM AllCombs ac
+  WHERE Currency != 'USD'
+  ORDER BY Date ASC;
+  "
+)
+# Assets in USD
+dbSendQuery(
+  conn      = dbConn,
+  statement = "
+    CREATE VIEW IF NOT EXISTS vAssetsUSD AS
+    SELECT
+    	a.Date,
+    	a.DisplayName,
+    	CASE
+        WHEN a.TransactionType = 'Buy' THEN a.Quantity
+    		ELSE -a.Quantity
+    	END AS Quantity,
+    	CASE
+    		WHEN a.TransactionType = 'Buy' THEN
+    			CASE
+    				WHEN a.TransactionCurrency != 'USD' THEN
+    					(
+    						SELECT xr1.XRate
+    						FROM vAssetsXRates xr1
+    						WHERE xr1.Date = a.Date
+    							AND xr1.Currency = a.TransactionCurrency
+    					) * a.PriceTotal
+    				ELSE a.PriceTotal
+    			END
+    		ELSE 0
+    	END AS PriceUSD,
+    	a.TickerSymbol,
+    	a.Type,
+    	a.[Group]
+    FROM assets a;
+  "
+)

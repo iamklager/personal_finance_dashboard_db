@@ -12,7 +12,7 @@ hcIncExpByMonth <- function(df, color = "limegreen", darkmode_on) {
   }
   
   res <- highchart2() |> 
-    hc_plotOptions(column = list(borderWidth = 0, stacking = "normal")) |> 
+    hc_plotOptions(column = list(borderWidth = 0, stacking = "normal"), tooltip = list(valueDecimals = 2)) |> 
     hc_xAxis(type = "category") |> 
     hc_yAxis(title = list(text = "Amount")) |> 
     hc_add_series(data = df, hcaes(x = Month, y = Amount, group = Category), type = "column", color = color) |> 
