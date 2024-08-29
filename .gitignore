@@ -4,3 +4,4 @@
 .Ruserdata
 .gitignore
 test_stuff/
+data/dbFinances.sqlite3

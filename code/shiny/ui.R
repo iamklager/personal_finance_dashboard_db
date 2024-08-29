@@ -161,8 +161,8 @@ ui <- navbarPage(
       full_screen = TRUE,
       title       = "Asset Price Development",
       height      = "435px",
-      nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
-      nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
+      nav_panel(title = "Stocks", highchartOutput("out_hcAssetGainCurvesStock", height = "100%")),
+      nav_panel(title = "Alternatives", highchartOutput("out_hcAssetGainCurvesAlternative", height = "100%"))
     )
   ),
 

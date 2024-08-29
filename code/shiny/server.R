@@ -23,8 +23,10 @@ server <- function(input, output, session) {
   
   ## Assets
   rv_Assets <- reactiveVal(QueryTableSimple(dbConn, "assets", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
-  rv_AssetAllocAcq <- reactiveVal(AssetAllocAcq(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
-  rv_AssetAllocCur <- reactiveVal(AssetAllocCur(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
+  rv_AssetAllocAcq   <- reactiveVal(AssetAllocAcq(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
+  rv_AssetAllocCur   <- reactiveVal(AssetAllocCur(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
+  rv_AssetGainCurves <- reactiveVal(GetAssetGainCurves(dbConn, dbGetQuery(dbConn, "SELECT DateFrom FROM settings LIMIT 1;")[[1]], Sys.Date()))
+  
   
   ### Event handling
   ## Periodically
@@ -32,6 +34,8 @@ server <- function(input, output, session) {
     # Writing price data
     QueryPrices(dbConn)
     QueryXRates(dbConn)
+    
+    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
   })
   
   ## Settings
@@ -210,6 +214,7 @@ server <- function(input, output, session) {
     QueryXRates(dbConn)
     rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
     rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
     updateTextInput(inputId = "in_DisplayNameAsset", value = "")
     updateNumericInput(inputId = "in_QuantityAsset", value = 0)
     updateNumericInput(inputId = "in_PriceTotalAsset", value = 0)
@@ -247,6 +252,7 @@ server <- function(input, output, session) {
     QueryXRates(dbConn)
     rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
     rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
     
     showNotification(ui = "Appended assets.", type = "default")
   })
@@ -277,6 +283,7 @@ server <- function(input, output, session) {
     QueryXRates(dbConn)
     rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
     rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
     
     showNotification(ui = "Overwrote assets.", type = "default")
   })
@@ -293,6 +300,7 @@ server <- function(input, output, session) {
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
     rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
     rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
   })
   observeEvent(input$in_DateTo, {
     rv_Income(QueryTableSimple(dbConn, "income", input$in_DateFrom, input$in_DateTo))
@@ -304,6 +312,7 @@ server <- function(input, output, session) {
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
     rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
     rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
   })
   observeEvent(input$in_EntireDateRange, {
     updateDateInput(inputId = "in_DateFrom", value = FirstDate(dbConn))
@@ -351,6 +360,8 @@ server <- function(input, output, session) {
   output$out_hcAssetAllocCur <- renderHighchart({ hcAssetAllocCur(rv_AssetAllocCur(), input$in_MainCurrency, input$in_DarkModeOn) })
   output$out_hcAssetGainsStock <- renderHighchart({ hcAssetGains(rv_AssetAllocAcq(), rv_AssetAllocCur(), "Stock", input$in_DarkModeOn) })
   output$out_hcAssetGainsAlternative <- renderHighchart({ hcAssetGains(rv_AssetAllocAcq(), rv_AssetAllocCur(), "Alternative", input$in_DarkModeOn) })
+  output$out_hcAssetGainCurvesStock <- renderHighchart({ hcAssetGainCurves(rv_AssetGainCurves(), "Stock", input$in_DarkModeOn) })
+  output$out_hcAssetGainCurvesAlternative <- renderHighchart({ hcAssetGainCurves(rv_AssetGainCurves(), "Alternative", input$in_DarkModeOn) })
   
 }
 
