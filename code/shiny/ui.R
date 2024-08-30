@@ -146,23 +146,23 @@ ui <- navbarPage(
         full_screen = TRUE,
         title       = "Asset allocation",
         height      = "435px",
-        nav_panel(title = "Current Value", highchartOutput("out_hcAssetAllocCur", height = "100%")),
-        nav_panel(title = "Acquisition Value", highchartOutput("out_hcAssetAllocAcq", height = "100%"))
+        nav_panel(title = "Current Value", highchartOutput("out_hcPlaceHolder", height = "100%")),
+        nav_panel(title = "Acquisition Value", highchartOutput("out_hcPlaceHolder", height = "100%"))
       ),
       navset_card_underline(
         full_screen = TRUE,
         title       = "Asset Gains",
         height      = "435px",
-        nav_panel(title = "Stocks", highchartOutput("out_hcAssetGainsStock", height = "100%")),
-        nav_panel(title = "Alternatives", highchartOutput("out_hcAssetGainsAlternative", height = "100%"))
+        nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
+        nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
       )
     ),
     navset_card_underline(
       full_screen = TRUE,
       title       = "Asset Price Development",
       height      = "435px",
-      nav_panel(title = "Stocks", highchartOutput("out_hcAssetGainCurvesStock", height = "100%")),
-      nav_panel(title = "Alternatives", highchartOutput("out_hcAssetGainCurvesAlternative", height = "100%"))
+      nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
+      nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
     )
   ),
 
@@ -183,7 +183,7 @@ ui <- navbarPage(
 
     navset_card_underline(
       full_screen = FALSE,
-      height = "885px",
+      height      = "885px",
       nav_Settings
     )
   )

@@ -4,17 +4,25 @@
 
 QueryPrices <- function(conn) {
   
-  # All tickers
-  ticker_symbols <- unlist(dbGetQuery(
-    conn = dbConn,
+  # All assets
+  dist_assets <- dbGetQuery(
+    conn = conn,
     statement = "
-      SELECT DISTINCT TickerSymbol
-      FROM assets;
+      SELECT *
+      FROM vDistAssets;
     "
-  ))
+  )
+  
+  # Stopping if no assets exist
+  if (nrow(dist_assets) == 0) { return(NULL) }
   
   # This is stupid but it works kinda sexy? kind off??
-  lapply(ticker_symbols, function(ticker_symbol) {
+  lapply(1:nrow(dist_assets), function(i) {
+    
+    asset_id      <- dist_assets[i, "AssetID"]
+    ticker_symbol <- dist_assets[i, "TickerSymbol"]
+    asset_quant   <- dist_assets[i, "TotalQuantity"]
+    source_curr   <- dist_assets[i, "SourceCurrency"]
     
     # Dates of the first and last transaction
     transaction_dates <- unlist(dbGetQuery(
@@ -24,9 +32,16 @@ QueryPrices <- function(conn) {
         	SELECT
         		Date,
         		ROW_NUMBER() OVER (ORDER BY Date ASC) AS RowAsc,
-        		ROW_NUMBER() OVER (ORDER BY Date DESC) AS RowDesc
-        	FROM vAssetsCumQuant
-        	WHERE TickerSymbol = '", ticker_symbol, "'
+        		ROW_NUMBER() OVER (ORDER BY Date DESC) AS RowDesc,
+        		concat(
+              DisplayName, '_',
+              TickerSymbol, '_',
+              Type, '_',
+              [Group], '_',
+              TransactionCurrency
+            ) AS AssetID
+        	FROM assets
+        	WHERE AssetID = '", asset_id, "'
         )
         
         SELECT
@@ -35,18 +50,6 @@ QueryPrices <- function(conn) {
         FROM FirstLast;
       ")
     ))
-    
-    # Value of the last transaction
-    last_trans_val <- dbGetQuery(
-      conn = conn,
-      statement = paste0("
-        SELECT QuantityCum
-        FROM vAssetsCumQuant
-        WHERE TickerSymbol = '", ticker_symbol, "'
-        ORDER BY Date DESC
-        LIMIT 1;
-      ")
-    )[[1]]
     
     # Last date in the price_data table
     last_date <- dbGetQuery(
@@ -62,7 +65,7 @@ QueryPrices <- function(conn) {
     
     # A very ugly condition tree to query prices if they exist
     if (length(last_date) == 0) {
-      if (last_trans_val == 0) {
+      if (asset_quant == 0) {
         prices <- tryCatch(
           {
             prices <- quantmod::getSymbols(
@@ -87,7 +90,7 @@ QueryPrices <- function(conn) {
         )
       }
     } else {
-      if (last_trans_val == 0) {
+      if (asset_quant == 0) {
         if (last_date != transaction_dates[2]) {
           prices <- tryCatch(
             {
@@ -125,7 +128,8 @@ QueryPrices <- function(conn) {
     # Formatting to fill the table and filling the table    
     prices <- data.frame(date = as.character(format(as.Date(index(prices)), "%Y-%m-%d")), coredata(prices))
     colnames(prices) <- c("Date", "Open", "High", "Low", "Close", "Volume", "Adjusted")
-    prices$TickerSymbol <- ticker_symbol
+    prices$TickerSymbol   <- ticker_symbol
+    prices$SourceCurrency <- source_curr
     dbWriteTable(conn = conn, name = "price_data", value = prices, append = TRUE)
   })
 }

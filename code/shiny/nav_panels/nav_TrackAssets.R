@@ -73,14 +73,14 @@ nav_TrackAssets <- nav_panel(
     textInput(
       inputId     = "in_TransCurrencyAsset",
       label       = "Transaction Currency",
-      value       = "",
+      value       = dbGetQuery(dbConn, "SELECT MainCurrency FROM settings LIMIT 1;")[[1]],
       placeholder = "none",
       width       = "16.02%"
     ),
     textInput(
       inputId     = "in_SourceCurrencyAsset",
       label       = "Source Currency",
-      value       = "",
+      value       = "USD",
       placeholder = "none",
       width       = "16.02%"
     ),

@@ -12,20 +12,21 @@ server <- function(input, output, session) {
   })
   
   ## Income
-  rv_Income      <- reactiveVal(QueryTableSimple(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
-  rv_IncomeGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
-  rv_IncomeMonth <- reactiveVal(QueryIncExpMonth(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
+  rv_Income      <- reactiveVal(QueryTableSimple(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  rv_IncomeGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  rv_IncomeMonth <- reactiveVal(QueryIncExpMonth(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
   
   ## Expenses
-  rv_Expenses      <- reactiveVal(QueryTableSimple(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
-  rv_ExpensesGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
-  rv_ExpensesMonth <- reactiveVal(QueryIncExpMonth(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
+  rv_Expenses      <- reactiveVal(QueryTableSimple(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  rv_ExpensesGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  rv_ExpensesMonth <- reactiveVal(QueryIncExpMonth(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
   
   ## Assets
-  rv_Assets <- reactiveVal(QueryTableSimple(dbConn, "assets", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], Sys.Date()))
-  rv_AssetAllocAcq   <- reactiveVal(AssetAllocAcq(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
-  rv_AssetAllocCur   <- reactiveVal(AssetAllocCur(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
-  rv_AssetGainCurves <- reactiveVal(GetAssetGainCurves(dbConn, dbGetQuery(dbConn, "SELECT DateFrom FROM settings LIMIT 1;")[[1]], Sys.Date()))
+  rv_Assets <- reactiveVal(QueryTableSimple(dbConn, "assets", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  # rv_InvCurv <- reactiveVal(InvestedCurves(dbConn))
+  # rv_AssetAllocAcq   <- reactiveVal(AssetAllocAcq(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
+  # rv_AssetAllocCur   <- reactiveVal(AssetAllocCur(dbConn, Sys.Date(), dbGetQuery(dbConn, "SELECT Currency FROM currencies LIMIT 1;")[[1]]))
+  # rv_AssetGainCurves <- reactiveVal(GetAssetGainCurves(dbConn, dbGetQuery(dbConn, "SELECT DateFrom FROM settings LIMIT 1;")[[1]], Sys.Date()))
   
   
   ### Event handling
@@ -35,7 +36,8 @@ server <- function(input, output, session) {
     QueryPrices(dbConn)
     QueryXRates(dbConn)
     
-    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    # rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    # rv_InvCurv(InvestedCurves(dbConn, dbGetQuery(dbConn)))
   })
   
   ## Settings
@@ -56,9 +58,9 @@ server <- function(input, output, session) {
   })
   # Currency 
   observeEvent(input$in_MainCurrency, {
-    dbSendQuery(dbConn, paste0("update settings set DarkModeOn = ", input$in_DarkModeOn, ";"))
-    rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetAllocCur(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
+    dbSendQuery(dbConn, paste0("update settings set MainCurrency = ", input$in_MainCurrency, ";"))
+    # rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetAllocCur(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
   })
   
   
@@ -209,12 +211,16 @@ server <- function(input, output, session) {
       input$in_TransCurrencyAsset, input$in_SourceCurrencyAsset
     )
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+    
     QueryPrices(dbConn)
     AddCurrencies(dbConn, c(input$in_TransCurrencyAsset, input$in_SourceCurrencyAsset))
     QueryXRates(dbConn)
-    rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+
+    # rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    # rv_InvCurv(InvestedCurves(dbConn, dbGetQuery(dbConn)))
+    
     updateTextInput(inputId = "in_DisplayNameAsset", value = "")
     updateNumericInput(inputId = "in_QuantityAsset", value = 0)
     updateNumericInput(inputId = "in_PriceTotalAsset", value = 0)
@@ -247,12 +253,15 @@ server <- function(input, output, session) {
     df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
     Append2Table(dbConn, "assets", df)
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+    
     QueryPrices(dbConn)
     AddCurrencies(dbConn, unique(c(df$TransactionCurrency, df$SourceCurrency)))
     QueryXRates(dbConn)
-    rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    
+    # rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    rv_InvCurv(InvestedCurves(dbConn, dbGetQuery(dbConn)))
     
     showNotification(ui = "Appended assets.", type = "default")
   })
@@ -278,12 +287,15 @@ server <- function(input, output, session) {
     df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
     OverWriteTable(dbConn, "assets", df)
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
+    
     QueryPrices(dbConn)
     AddCurrencies(dbConn, unique(c(df$TransactionCurrency, df$SourceCurrency)))
     QueryXRates(dbConn)
-    rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    
+    # rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    rv_InvCurv(InvestedCurves(dbConn, dbGetQuery(dbConn)))
     
     showNotification(ui = "Overwrote assets.", type = "default")
   })
@@ -291,28 +303,36 @@ server <- function(input, output, session) {
   
   ## Date selection
   observeEvent(input$in_DateFrom, {
+    # Income
     rv_Income(QueryTableSimple(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # Expenses
     rv_Expenses(QueryTableSimple(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # Assets
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
-    rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    
+    # rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
   })
   observeEvent(input$in_DateTo, {
+    # Income
     rv_Income(QueryTableSimple(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # Expenses
     rv_Expenses(QueryTableSimple(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # Assets
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
-    rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
-    rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
+    
+    # rv_AssetAllocAcq(AssetAllocAcq(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetAllocCur(AssetAllocCur(dbConn, input$in_DateTo, input$in_MainCurrency))
+    # rv_AssetGainCurves(GetAssetGainCurves(dbConn, input$in_DateFrom, input$in_DateTo))
   })
   observeEvent(input$in_EntireDateRange, {
     updateDateInput(inputId = "in_DateFrom", value = FirstDate(dbConn))
@@ -356,12 +376,12 @@ server <- function(input, output, session) {
   
   ## Assets
   output$out_hcPlaceHolder <- renderHighchart({})
-  output$out_hcAssetAllocAcq <- renderHighchart({ hcAssetAllocAcq(rv_AssetAllocAcq(), input$in_MainCurrency, input$in_DarkModeOn) })
-  output$out_hcAssetAllocCur <- renderHighchart({ hcAssetAllocCur(rv_AssetAllocCur(), input$in_MainCurrency, input$in_DarkModeOn) })
-  output$out_hcAssetGainsStock <- renderHighchart({ hcAssetGains(rv_AssetAllocAcq(), rv_AssetAllocCur(), "Stock", input$in_DarkModeOn) })
-  output$out_hcAssetGainsAlternative <- renderHighchart({ hcAssetGains(rv_AssetAllocAcq(), rv_AssetAllocCur(), "Alternative", input$in_DarkModeOn) })
-  output$out_hcAssetGainCurvesStock <- renderHighchart({ hcAssetGainCurves(rv_AssetGainCurves(), "Stock", input$in_DarkModeOn) })
-  output$out_hcAssetGainCurvesAlternative <- renderHighchart({ hcAssetGainCurves(rv_AssetGainCurves(), "Alternative", input$in_DarkModeOn) })
+  # output$out_hcAssetAllocAcq <- renderHighchart({ hcAssetAllocAcq(rv_AssetAllocAcq(), input$in_MainCurrency, input$in_DarkModeOn) })
+  # output$out_hcAssetAllocCur <- renderHighchart({ hcAssetAllocCur(rv_AssetAllocCur(), input$in_MainCurrency, input$in_DarkModeOn) })
+  # output$out_hcAssetGainsStock <- renderHighchart({ hcAssetGains(rv_AssetAllocAcq(), rv_AssetAllocCur(), "Stock", input$in_DarkModeOn) })
+  # output$out_hcAssetGainsAlternative <- renderHighchart({ hcAssetGains(rv_AssetAllocAcq(), rv_AssetAllocCur(), "Alternative", input$in_DarkModeOn) })
+  # output$out_hcAssetGainCurvesStock <- renderHighchart({ hcAssetGainCurves(rv_AssetGainCurves(), "Stock", input$in_DarkModeOn) })
+  # output$out_hcAssetGainCurvesAlternative <- renderHighchart({ hcAssetGainCurves(rv_AssetGainCurves(), "Alternative", input$in_DarkModeOn) })
   
 }
 
