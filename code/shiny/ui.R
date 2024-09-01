@@ -11,10 +11,12 @@ ui <- navbarPage(
   ),
   title = "My Finances",
   windowTitle = "My Finances",
-  selected = "Income",
+  selected = "Tracking",
   lang = "en",
   
   sidebar = sidebar(
+    tags$hr(),
+    tags$b("Set Date Range:"),
     div(
       style = "display: flex; gap: 20px;",
       dateInput(
@@ -48,6 +50,22 @@ ui <- navbarPage(
         width   = "50%"
       )
     ),
+    div(
+      style = "display: flex; gap: 20px;",
+      actionButton(
+        inputId = "in_OneYearDateRange",
+        label   = "1 Year",
+        width   = "50%"
+      ),
+      actionButton(
+        inputId = "in_ThisMonthDateRange",
+        label   = "Month",
+        width   = "50%"
+      )
+    ),
+    #tags$br(),
+    tags$hr(),
+    tags$b("Download Report:"),
     downloadButton(
       outputId = "out_Download",
       label = "Download .csv"
@@ -144,25 +162,25 @@ ui <- navbarPage(
     layout_columns(
       navset_card_underline(
         full_screen = TRUE,
-        title       = "Asset allocation",
+        title       = "Asset Allocation",
         height      = "435px",
-        nav_panel(title = "Current Value", highchartOutput("out_hcPlaceHolder", height = "100%")),
-        nav_panel(title = "Acquisition Value", highchartOutput("out_hcPlaceHolder", height = "100%"))
+        nav_panel(title = "Current Value", highchartOutput("out_hcAssetAllocCur", height = "100%")),
+        nav_panel(title = "Acquisition Value", highchartOutput("out_hcAssetAllocAcq", height = "100%"))
       ),
       navset_card_underline(
         full_screen = TRUE,
         title       = "Asset Gains",
         height      = "435px",
-        nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
-        nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
+        nav_panel(title = "Stocks", highchartOutput("out_hcAssetGainsStock", height = "100%")),
+        nav_panel(title = "Alternatives", highchartOutput("out_hcAssetGainsAlternative", height = "100%"))
       )
     ),
     navset_card_underline(
       full_screen = TRUE,
-      title       = "Asset Price Development",
+      title       = "Cumulated Asset Development",
       height      = "435px",
-      nav_panel(title = "Stocks", highchartOutput("out_hcPlaceHolder", height = "100%")),
-      nav_panel(title = "Alternatives", highchartOutput("out_hcPlaceHolder", height = "100%"))
+      nav_panel(title = "Stocks", highchartOutput("out_hcAssetGainCurvesStock", height = "100%")),
+      nav_panel(title = "Alternatives", highchartOutput("out_hcAssetGainCurvesAlternative", height = "100%"))
     )
   ),
 

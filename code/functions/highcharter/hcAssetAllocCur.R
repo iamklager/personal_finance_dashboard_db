@@ -2,7 +2,7 @@
 # Plots the user's asset allocation at the current value for his selected currency.
 
 
-hcAssetAllocCur <- function(df, main_currency, darkmode_on) {
+hcAssetAllocCur <- function(df, current_assets, to, main_currency, darkmode_on) {
   if (nrow(df) == 0) {
     return(
       shiny::validate(
@@ -10,6 +10,12 @@ hcAssetAllocCur <- function(df, main_currency, darkmode_on) {
       )
     )
   }
+  
+  df <- df[(df$Date <= to) & (df$AssetID %in% current_assets), ]
+  df <- split(df, df$AssetID)
+  df <- dplyr::bind_rows(lapply(df, function(x) {
+    x <- x[x$Date == max(x$Date), ]
+  }))
   
   res <- highchart2() |> 
     hc_plotOptions(
@@ -23,8 +29,8 @@ hcAssetAllocCur <- function(df, main_currency, darkmode_on) {
       )
     ) |> 
     hc_xAxis(type = "category") |> 
-    hc_yAxis(title = list(text = "Position Size")) |> 
-    hc_add_series(data = df, hcaes(x = Type, y = PositionSize, group = DisplayName), type = "column")
+    hc_yAxis(title = list(text = "Amount")) |> 
+    hc_add_series(data = df, hcaes(x = Type, y = Value, group = DisplayName), type = "column")
   
   if (darkmode_on) {
     hc_add_theme(res, hc_theme_dark())
@@ -32,5 +38,4 @@ hcAssetAllocCur <- function(df, main_currency, darkmode_on) {
     hc_add_theme(res, hc_theme_light())
   }
 }
-
 

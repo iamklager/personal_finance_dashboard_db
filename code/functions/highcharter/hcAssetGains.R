@@ -1,19 +1,27 @@
-#### hcAssetAllocAcq
-# Plots the user's asset allocation at acquisition value for his selected currency.
+#### hcAssetGains
+# Plots the user's asset gains in %.
 
 
-hcAssetGains <- function(acq, cur, type, darkmode_on) {
-  if (nrow(acq) == 0 | nrow(cur) == 0) {
+hcAssetGains <- function(df, current_assets, type, from, to, darkmode_on) {
+  if ((nrow(df) == 0) || (from == to)) {
     return(
       shiny::validate(
-        need((nrow(df) != 0), "No data available.")
+        need(((nrow(df) != 1) & (from != to)), "No data available.")
       )
     )
   }
   
-  df <- merge(x = acq, y = cur, by = c("DisplayName", "TickerSymbol", "Type", "Group"), all = FALSE)
-  df$Gain <- ((df$PositionSize.y / df$PositionSize.x) - 1) * 100
-  df <-  df[df$Type == type, ]
+  df <- df[(df$Date >= from) & (df$Date <= to) & (df$Type == type) & (df$AssetID %in% current_assets), ]
+  df$RelVal <- df$Value / df$AcqVal
+  df <- na.omit(df)
+  df <- split(df, df$AssetID)
+  df <- dplyr::bind_rows(lapply(df, function(x) {
+    data.frame(
+      DisplayName = x$DisplayName[1],
+      Group = x$Group[1],
+      Gain = 100 * (x$RelVal[x$Date == max(x$Date)] - x$RelVal[x$Date == min(x$Date)])
+    )
+  }))
   
   res <- highchart2() |> 
     hc_plotOptions(

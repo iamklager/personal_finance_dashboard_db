@@ -16,7 +16,8 @@ dbSendQuery(
     Amount real not null,
     Product text,
     Source text,
-    Category text
+    Category text,
+    Currency text not null
   );
   "
 )
@@ -32,7 +33,8 @@ dbSendQuery(
     Amount real not null,
     Product text,
     Source text,
-    Category text
+    Category text,
+    Currency text not null
   );
   "
 )
