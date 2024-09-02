@@ -11,7 +11,7 @@ ui <- navbarPage(
   ),
   title = "My Finances",
   windowTitle = "My Finances",
-  selected = "Tracking",
+  selected = "Summary",
   lang = "en",
   
   sidebar = sidebar(
@@ -79,13 +79,14 @@ ui <- navbarPage(
       col_widths = c(6, 6),
       navset_card_underline(
         full_screen = FALSE,
-        title       = "Profit/Loss (Total)",
+        title       = "Profit/Loss",
         height      = "435px",
-        nav_panel(title = "", highchartOutput("out_hcPlaceHolder", height = "100%"))
+        nav_panel(title = "Total", uiOutput("out_txtPLTotal")),
+        nav_panel(title = "As % of Income", uiOutput("out_txtPLRatio"))
       ),
       navset_card_underline(
         full_screen = FALSE,
-        title       = "Profit/Loss (As % of Income)",
+        title       = "Something",
         height      = "435px",
         nav_panel(title = "", highchartOutput("out_hcPlaceHolder", height = "100%"))
       )

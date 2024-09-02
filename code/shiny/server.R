@@ -16,16 +16,16 @@ server <- function(input, output, session) {
     dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d"),
     dbGetQuery(dbConn, "select MainCurrency FROM settings limit 1;"[[1]])
   ))
-  rv_IncomeGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
-  rv_IncomeMonth <- reactiveVal(QueryIncExpMonth(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  # rv_IncomeGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  # rv_IncomeMonth <- reactiveVal(QueryIncExpMonth(dbConn, "income", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
   
   ## Expenses
   rv_Expenses      <- reactiveVal(QueryTableMainCur(
     dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d"),
     dbGetQuery(dbConn, "select MainCurrency FROM settings limit 1;"[[1]])
   ))
-  rv_ExpensesGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
-  rv_ExpensesMonth <- reactiveVal(QueryIncExpMonth(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  # rv_ExpensesGroup <- reactiveVal(QueryIncExpGrouped(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
+  # rv_ExpensesMonth <- reactiveVal(QueryIncExpMonth(dbConn, "expenses", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
   
   ## Assets
   rv_Assets        <- reactiveVal(QueryTableSimple(dbConn, "assets", dbGetQuery(dbConn, "select DateFrom from settings limit 1;")[[1]], format(Sys.Date(), "%Y-%m-%d")))
@@ -90,8 +90,9 @@ server <- function(input, output, session) {
       input$in_SourceIncome, input$in_CategoryIncome, input$in_CurrencyIncome
     )
     rv_Income(QueryTableMainCur(dbConn, "income", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
-    rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    
     updateNumericInput(inputId = "in_AmountIncome", value = 0)
     updateTextInput(inputId = "in_ProductIncome", value = "")
     updateTextInput(inputId = "in_SourceIncome", value = "")
@@ -118,8 +119,8 @@ server <- function(input, output, session) {
     df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
     Append2Table(dbConn, "income", df)
     rv_Income(QueryTableMainCur(dbConn, "income", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
-    rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     
     showNotification(ui = "Appended income.", type = "default")
   })
@@ -142,8 +143,8 @@ server <- function(input, output, session) {
     df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
     OverWriteTable(dbConn, "income", df)
     rv_Income(QueryTableMainCur(dbConn, "income", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
-    rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     
     showNotification(ui = "Overwrote income.", type = "default")
   })
@@ -158,8 +159,9 @@ server <- function(input, output, session) {
       input$in_SourceExpenses, input$in_CategoryExpenses, input$in_CurrencyExpenses
     )
     rv_Expenses(QueryTableMainCur(dbConn, "expenses", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
-    rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    
     updateNumericInput(inputId = "in_AmountExpenses", value = 0)
     updateTextInput(inputId = "in_ProductExpenses", value = "")
     updateTextInput(inputId = "in_SourceExpenses", value = "")
@@ -186,8 +188,8 @@ server <- function(input, output, session) {
     df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
     Append2Table(dbConn, "expenses", df)
     rv_Expenses(QueryTableMainCur(dbConn, "expenses", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
-    rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     
     showNotification(ui = "Appended expenses.", type = "default")
   })
@@ -210,8 +212,8 @@ server <- function(input, output, session) {
     df$Date <- format(as.Date(df$Date), "%Y-%m-%d")
     OverWriteTable(dbConn, "expenses", df)
     rv_Expenses(QueryTableMainCur(dbConn, "expenses", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
-    rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     
     showNotification(ui = "Overwrote expenses.", type = "default")
   })
@@ -328,12 +330,12 @@ server <- function(input, output, session) {
   observeEvent(input$in_DateFrom, {
     # Income
     rv_Income(QueryTableMainCur(dbConn, "income", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
-    rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     # Expenses
     rv_Expenses(QueryTableMainCur(dbConn, "expenses", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
-    rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     # Assets
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
     
@@ -344,12 +346,12 @@ server <- function(input, output, session) {
   observeEvent(input$in_DateTo, {
     # Income
     rv_Income(QueryTableMainCur(dbConn, "income", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
-    rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeGroup(QueryIncExpGrouped(dbConn, "income", input$in_DateFrom, input$in_DateTo))
+    # rv_IncomeMonth(QueryIncExpMonth(dbConn, "income", input$in_DateFrom, input$in_DateTo))
     # Expenses
     rv_Expenses(QueryTableMainCur(dbConn, "expenses", input$in_DateFrom, input$in_DateTo, input$in_MainCurrency))
-    rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
-    rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesGroup(QueryIncExpGrouped(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
+    # rv_ExpensesMonth(QueryIncExpMonth(dbConn, "expenses", input$in_DateFrom, input$in_DateTo))
     # Assets
     rv_Assets(QueryTableSimple(dbConn, "assets", input$in_DateFrom, input$in_DateTo))
     
@@ -401,14 +403,14 @@ server <- function(input, output, session) {
   output$out_DTAssets   <- DT::renderDT({ DT::datatable(rv_Assets(), options = list(paging = TRUE, pageLength = 5)) })
   
   ## Income
-  output$out_hcIncomeCategory <- renderHighchart({ hcIncExpByCategory(rv_IncomeGroup(), input$in_DarkModeOn) })
-  output$out_hcIncomeMonth    <- renderHighchart({ hcIncExpByMonth(rv_IncomeMonth(), input$in_ColorProfit, input$in_DarkModeOn) })
-  output$out_hcIncomeSource   <- renderHighchart({ hcIncExpBySource(rv_IncomeGroup(), input$in_DarkModeOn)})
+  output$out_hcIncomeCategory <- renderHighchart({ hcIncExpByCategory(rv_Income(), input$in_MainCurrency, input$in_DarkModeOn) })
+  output$out_hcIncomeMonth    <- renderHighchart({ hcIncExpByMonth(rv_Income(), input$in_ColorProfit, input$in_MainCurrency, input$in_DarkModeOn) })
+  output$out_hcIncomeSource   <- renderHighchart({ hcIncExpBySource(rv_Income(), input$in_MainCurrency, input$in_DarkModeOn)})
   
   ## Expenses
-  output$out_hcExpensesCategory <- renderHighchart({ hcIncExpByCategory(rv_ExpensesGroup(), input$in_DarkModeOn) })
-  output$out_hcExpensesMonth    <- renderHighchart({ hcIncExpByMonth(rv_ExpensesMonth(), input$in_ColorLoss, input$in_DarkModeOn) })
-  output$out_hcExpensesSource   <- renderHighchart({ hcIncExpBySource(rv_ExpensesGroup(), input$in_DarkModeOn)})
+  output$out_hcExpensesCategory <- renderHighchart({ hcIncExpByCategory(rv_Expenses(), input$in_MainCurrency, input$in_DarkModeOn) })
+  output$out_hcExpensesMonth    <- renderHighchart({ hcIncExpByMonth(rv_Expenses(), input$in_ColorLoss, input$in_MainCurrency, input$in_DarkModeOn) })
+  output$out_hcExpensesSource   <- renderHighchart({ hcIncExpBySource(rv_Expenses(), input$in_MainCurrency, input$in_DarkModeOn)})
   
   ## Assets
   output$out_hcPlaceHolder <- renderHighchart({})
@@ -418,6 +420,22 @@ server <- function(input, output, session) {
   output$out_hcAssetGainsAlternative <- renderHighchart({ hcAssetGains(rv_InvCurv(), rv_CurrentAssets(), "Alternative", input$in_DateFrom, input$in_DateTo, input$in_DarkModeOn) })
   output$out_hcAssetGainCurvesStock <- renderHighchart({ hcAssetGainCurves(rv_InvCurv(), "Stock", input$in_DateFrom, input$in_DateTo, input$in_DarkModeOn) })
   output$out_hcAssetGainCurvesAlternative <- renderHighchart({ hcAssetGainCurves(rv_InvCurv(), "Alternative", input$in_DateFrom, input$in_DateTo, input$in_DarkModeOn) })
+  
+  ## Summary
+  output$out_txtPLTotal <- renderUI({ 
+    txtPLTotal(
+      rv_Income(), rv_Expenses(), rv_InvCurv(), input$in_DateFrom, input$in_DateTo, input$in_MainCurrency, 
+      input$in_ColorProfit, input$in_ColorLoss
+    )
+  })
+  output$out_txtPLRatio <- renderUI({
+    txtPLRatio(
+      rv_Income(), rv_Expenses(), rv_InvCurv(), input$in_DateFrom, input$in_DateTo, 
+      input$in_ColorProfit, input$in_ColorLoss
+    )
+  })
+  output$out_hcPLSource <- renderHighchart({})
+  output$out_hcPLMonth  <- renderHighchart({})
   
 }
 

@@ -56,7 +56,7 @@ QueryTableMainCur <- function(conn, table, from, to, main_currency) {
       )
       SELECT
       		Date,
-      		Amount * CASE
+      		Amount / CASE
       			WHEN XRate IS NULL THEN 1
       			ELSE XRate
       		END AS Amount,
