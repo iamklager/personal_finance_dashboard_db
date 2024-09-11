@@ -1,5 +1,5 @@
 nav_TrackIncome <- nav_panel(
-  title = "Income",
+  title = "Income" |> tooltip(l_ToolTips[["IncomeItems"]]),
   div(
     style = "display: block;",
     DT::DTOutput("out_DTIncome")

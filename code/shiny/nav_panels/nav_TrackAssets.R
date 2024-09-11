@@ -1,5 +1,5 @@
 nav_TrackAssets <- nav_panel(
-  title = "Assets",
+  title = "Assets" |> tooltip(l_ToolTips[["AssetItems"]]),
   div(
     style = "display: block;",
     DT::DTOutput("out_DTAssets")

@@ -3,15 +3,23 @@
 
 
 hcAssetGains <- function(df, current_assets, type, from, to, darkmode_on) {
-  if ((nrow(df) == 0) || (from == to)) {
+  # Data check
+  if (is.null(df) | (from >= to)) {
     return(
       shiny::validate(
-        need(((nrow(df) != 1) & (from != to)), "No data available.")
+        need((!is.null(df) & (from < to)), "No data available.")
+      )
+    )
+  }
+  df <- df[(df$Date >= from) & (df$Date <= to) & (df$Type == type) & (df$AssetID %in% current_assets), ]
+  if (nrow(df) == 0) {
+    return(
+      shiny::validate(
+        need(nrow(df) != 0, "No data available.")
       )
     )
   }
   
-  df <- df[(df$Date >= from) & (df$Date <= to) & (df$Type == type) & (df$AssetID %in% current_assets), ]
   df$RelVal <- df$Value / df$AcqVal
   df <- na.omit(df)
   df <- split(df, df$AssetID)

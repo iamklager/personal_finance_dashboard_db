@@ -3,10 +3,10 @@
 
 
 hcAssetAllocAcq <- function(df, current_assets, to, main_currency, darkmode_on) {
-  if (nrow(df) == 0) {
+  if (is.null(df) | (length(current_assets) == 0)) {
     return(
       shiny::validate(
-        need((nrow(df) != 0), "No data available.")
+        need((!is.null(df) & (length(current_assets) != 0)), "No data available.")
       )
     )
   }

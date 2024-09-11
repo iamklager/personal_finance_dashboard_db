@@ -171,13 +171,13 @@ dbSendQuery(
           ELSE -Quantity
         END
       ) AS TotalQuantity,
-      concat(
-        DisplayName, '_',
-        TickerSymbol, '_',
-        Type, '_',
-        [Group], '_',
+      (
+        DisplayName || '_' || 
+        TickerSymbol || '_' || 
+        Type || '_' || 
+        [Group] || '_' || 
         TransactionCurrency
-      ) AS AssetID
+      )AS AssetID
     FROM Assets
     GROUP BY AssetID;
   "
@@ -225,11 +225,11 @@ dbSendQuery(
     			LIMIT 1
     		)
     	END AS PriceTotalUSD,
-    	concat(
-    	  a.DisplayName, '_',
-    	  a.TickerSymbol, '_',
-    	  a.Type, '_',
-    	  a.[Group], '_',
+      (
+        a.DisplayName || '_' || 
+    	  a.TickerSymbol || '_' || 
+    	  a.Type || '_' || 
+    	  a.[Group] || '_' || 
     	  a.TransactionCurrency
     	) AS AssetID
     FROM AssetsSigned a;

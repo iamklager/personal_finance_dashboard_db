@@ -1,5 +1,5 @@
 nav_TrackExpenses <- nav_panel(
-  title = "Expenses",
+  title = "Expenses" |> tooltip(l_ToolTips[["ExpensesItems"]]),
   div(
     style = "display: block;",
     DT::DTOutput("out_DTExpenses")
