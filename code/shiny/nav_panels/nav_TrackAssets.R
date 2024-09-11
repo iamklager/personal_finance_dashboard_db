@@ -1,9 +1,11 @@
 nav_TrackAssets <- nav_panel(
-  title = "Assets",
+  title = "Assets" |> tooltip(l_ToolTips[["AssetItems"]]),
   div(
     style = "display: block;",
     DT::DTOutput("out_DTAssets")
   ),
+  tags$hr(),
+  tags$b("Track Asset:"),
   div(
     style = "display: inline-flex; border-width: thick; gap: 1.50%; justify-content: center; align-items: center;",
     dateInput(
@@ -12,14 +14,14 @@ nav_TrackAssets <- nav_panel(
       value   = Sys.Date(),
       max     = Sys.Date(),
       format  = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]],
-      width   = "8.70%"
+      width   = "8%"
     ),
     textInput(
       inputId     = "in_DisplayNameAsset",
       label       = "Name",
       value       = "",
       placeholder = "none",
-      width       = "34.78%"
+      width       = "25%"
     ),
     numericInput(
       inputId = "in_QuantityAsset",
@@ -27,7 +29,7 @@ nav_TrackAssets <- nav_panel(
       value   = 0.00,
       min     = 0.00,
       step    = 1.00,
-      width   = "11.30%"
+      width   = "12%"
     ),
     numericInput(
       inputId = "in_PriceTotalAsset",
@@ -35,14 +37,14 @@ nav_TrackAssets <- nav_panel(
       value   = 0.00,
       min     = 0.00,
       step    = 0.50,
-      width   = "11.30%"
+      width   = "15%"
     ),
     textInput(
       inputId     = "in_TickerSymbolAsset",
       label       = "Ticker Symbol",
       value       = "",
       placeholder = "none",
-      width       = "11.30%"
+      width       = "12%"
     ),
     selectizeInput(
       inputId     = "in_TypeAsset",
@@ -50,14 +52,14 @@ nav_TrackAssets <- nav_panel(
       choices     = c("Stock", "Alternative"),
       selected    = "Stock",
       multiple    = "FALSE",
-      width       = "11.30%"
+      width       = "12%"
     ),
     textInput(
       inputId     = "in_GroupAsset",
       label       = "Group",
       value       = "",
       placeholder = "none",
-      width       = "11.30%"
+      width       = "12%"
     )
   ),
   div(
@@ -68,30 +70,32 @@ nav_TrackAssets <- nav_panel(
       choices     = c("Buy", "Sell"),
       selected    = "Buy",
       multiple    = "FALSE",
-      width       = "16.02%"
+      width       = "18.16%"
     ),
     textInput(
       inputId     = "in_TransCurrencyAsset",
       label       = "Transaction Currency",
-      value       = "",
+      value       = dbGetQuery(dbConn, "SELECT MainCurrency FROM settings LIMIT 1;")[[1]],
       placeholder = "none",
-      width       = "16.02%"
+      width       = "18.16%"
     ),
     textInput(
       inputId     = "in_SourceCurrencyAsset",
       label       = "Source Currency",
-      value       = "",
+      value       = "USD",
       placeholder = "none",
-      width       = "16.02%"
+      width       = "18.17%"
     ),
     input_task_button(
       id         = "in_TrackAsset",
       label      = "Track",
       label_busy = "Tracking asset",
       auto_reset = TRUE, state = "ready",
-      style      = "width: 47.34%; height: 40px;"
+      style      = "width: 41%; height: 40px;"
     )
   ),
+  tags$hr(),
+  tags$b("File Upload:"),
   div(
     style = "display: inline-flex; border-width: thick; gap: 1.50%; justify-content: center; align-items: center;",
     fileInput(
@@ -99,21 +103,21 @@ nav_TrackAssets <- nav_panel(
       label   = "Assets file",
       accept  = c(".csv", ".xlsx"),
       placeholder = ".csv or .xlsx",
-      width = "51.16%"
+      width = "57.50%"
     ),
     input_task_button(
       id         = "in_AppendFileAssets",
       label      = "Append",
       label_busy = "Appending to assets...",
       auto_reset = TRUE, state = "ready",
-      style      = "width: 22.92%; height: 40px;"
+      style      = "width: 19.75%; height: 40px;"
     ),
     input_task_button(
       id         = "in_OverwriteFileAssets",
       label      = "Overwrite",
       label_busy = "Overwriting asset...",
       auto_reset = TRUE, state = "ready",
-      style      = "width: 22.92%; height: 40px;"
+      style      = "width: 19.75%; height: 40px;"
     )
   )
 )

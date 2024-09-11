@@ -3,7 +3,7 @@
 
 
 FirstDate <- function(conn) {
-  dbGetQuery(
+  res <- dbGetQuery(
     conn      = dbConn, 
     statement = "
     select min(Date)
@@ -16,6 +16,11 @@ FirstDate <- function(conn) {
     );
     "
   )[[1]]
+  if (is.na(res)) {
+    res <- format(Sys.Date(), "%Y-01-01")
+  }
+  
+  res
 }
 
 

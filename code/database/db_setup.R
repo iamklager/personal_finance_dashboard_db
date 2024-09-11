@@ -16,7 +16,8 @@ dbSendQuery(
     Amount real not null,
     Product text,
     Source text,
-    Category text
+    Category text,
+    Currency text not null
   );
   "
 )
@@ -32,7 +33,8 @@ dbSendQuery(
     Amount real not null,
     Product text,
     Source text,
-    Category text
+    Category text,
+    Currency text not null
   );
   "
 )
@@ -63,16 +65,17 @@ dbSendQuery(
 dbSendQuery(
   conn      = dbConn, 
   statement = "
-  create table if not exists price_data
+  CREATE TABLE IF NOT EXISTS price_data
   (
-    Date text not null,
-    Open real,
-    High real,
-    Low real,
-    Close real,
-    Volume real,
-    Adjusted real,
-    TickerSymbol text not null
+    Date TEXT NOT NULL,
+    Open REAL,
+    High REAL,
+    Low REAL,
+    Close REAL,
+    Volume REAL,
+    Adjusted REAL,
+    TickerSymbol TEXT NOT NULL,
+    SourceCurrency text NOT NULL
   );
   "
 )
@@ -150,122 +153,109 @@ dbSendQuery(
 
 
 ### Views ----
-# Cumulative assets
+# Distinct assets
 dbSendQuery(
   conn      = dbConn,
   statement = "
-  CREATE VIEW IF NOT EXISTS vAssetsCumQuant AS
-  SELECT 
-  	Date,
-  	DisplayName, 
-  	TickerSymbol, 
-  	Type,
-  	[Group],
-    	SUM(
-  		CASE
-  			WHEN TransactionType = 'Buy' THEN Quantity
-  			ELSE -Quantity
-  		END
-  	) OVER (
-  		PARTITION BY
-  			TickerSymbol,
-  			Type,
-  			[Group]
-  		ORDER BY Date ASC
-  	) AS QuantityCum,
-  	TransactionCurrency,
-  	SourceCurrency
-  FROM assets
-  ORDER BY
-  Date ASC;
+    CREATE VIEW IF NOT EXISTS vDistAssets AS
+    SELECT DISTINCT
+      DisplayName,
+      TickerSymbol,
+      Type,
+      [Group],
+      TransactionCurrency,
+      SourceCurrency,
+      SUM(
+        CASE
+          WHEN TransactionType = 'Buy' THEN Quantity
+          ELSE -Quantity
+        END
+      ) AS TotalQuantity,
+      (
+        DisplayName || '_' || 
+        TickerSymbol || '_' || 
+        Type || '_' || 
+        [Group] || '_' || 
+        TransactionCurrency
+      )AS AssetID
+    FROM Assets
+    GROUP BY AssetID;
   "
 )
-# All Dates
-dbSendQuery(
-  conn      = dbConn,
-  statement = "
-  CREATE VIEW IF NOT EXISTS vAssetsAllDates AS
-  SELECT DISTINCT Date
-  FROM (
-  	SELECT Date FROM assets
-  	UNION
-  	SELECT Date FROM xrates
-  	UNION
-  	SELECT Date FROM price_data
-  )
-  WHERE Date >= (SELECT DATE(MIN(Date), '-7 day') FROM assets)
-  ORDER BY Date ASC;
-  "
-)
-# All xrates
-dbSendQuery(
-  conn      = dbConn,
-  statement = "
-  CREATE VIEW IF NOT EXISTS vAssetsXRates AS
-  WITH AllCombs AS (
-  	SELECT DISTINCT
-  		ad.Date,
-  		cr.Currency,
-  		xr.Adjusted
-  	FROM vAssetsAllDates ad
-  	CROSS JOIN (
-  		SELECT Currency
-  		FROM currencies
-  		WHERE Currency != 'USD'
-  	) cr
-  	LEFT JOIN xrates xr
-  		ON ad.Date = xr.Date
-  		AND cr.Currency = xr.Currency
-  )
-  SELECT
-  	Date,
-  	Currency,
-  	COALESCE (
-  		Adjusted,
-  		(
-  			SELECT ac2.Adjusted
-  			FROM AllCombs ac2
-  			WHERE ac2.Date < ac.Date
-  			AND ac2.Currency = ac.Currency
-        AND ac2.Adjusted IS NOT NULL
-  			ORDER BY ac2.Date DESC
-  			LIMIT 1
-  		)
-  	) AS XRate
-  FROM AllCombs ac
-  WHERE Currency != 'USD'
-  ORDER BY Date ASC;
-  "
-)
+
 # Assets in USD
 dbSendQuery(
   conn      = dbConn,
   statement = "
     CREATE VIEW IF NOT EXISTS vAssetsUSD AS
-    SELECT
+    WITH AssetsSigned AS (
+    	SELECT
+    		Date,
+    		DisplayName,
+    		CASE
+    			WHEN TransactionType = 'Buy' THEN Quantity
+    			ELSE -Quantity
+    		END AS Quantity,
+    		Case
+    			WHEN TransactionType = 'Buy' THEN PriceTotal
+    			ELSE -PriceTotal
+    		END AS PriceTotal,
+    		TickerSymbol,
+    		Type,
+    		[Group],
+    		TransactionCurrency,
+    		SourceCurrency
+    	FROM assets
+    )
+    SELECT 
     	a.Date,
     	a.DisplayName,
-    	CASE
-        WHEN a.TransactionType = 'Buy' THEN a.Quantity
-    		ELSE -a.Quantity
-    	END AS Quantity,
-    	CASE
-    		WHEN a.TransactionType = 'Buy' THEN
-    			CASE
-    				WHEN a.TransactionCurrency != 'USD' THEN
-    					(
-    						SELECT xr1.XRate
-    						FROM vAssetsXRates xr1
-    						WHERE xr1.Date = a.Date
-    							AND xr1.Currency = a.TransactionCurrency
-    					) * a.PriceTotal
-    				ELSE a.PriceTotal
-    			END
-    		ELSE 0
-    	END AS PriceUSD,
+    	a.Quantity,
     	a.TickerSymbol,
     	a.Type,
-    	a.[Group]
-    FROM assets a;
+    	a.[Group],
+    	CASE
+    		WHEN a.TransactionCurrency = 'USD' THEN a.PriceTotal
+    		ELSE a.PriceTotal * (
+    			SELECT xr.Adjusted
+    			FROM xrates xr
+    			WHERE xr.Date <= a.Date
+    				AND xr.Currency = a.TransactionCurrency
+    			ORDER BY xr.Date DESC
+    			LIMIT 1
+    		)
+    	END AS PriceTotalUSD,
+      (
+        a.DisplayName || '_' || 
+    	  a.TickerSymbol || '_' || 
+    	  a.Type || '_' || 
+    	  a.[Group] || '_' || 
+    	  a.TransactionCurrency
+    	) AS AssetID
+    FROM AssetsSigned a;
   "
 )
+
+# Prices in USD
+dbSendQuery(
+  conn      = dbConn,
+  statement = "
+    CREATE VIEW IF NOT EXISTS vPricesUSD AS
+    SELECT 
+    	pd.Date,
+    	pd.TickerSymbol,
+    	CASE
+    		WHEN pd.SourceCurrency = 'USD' THEN pd.Adjusted
+    		ELSE pd.Adjusted * (
+    		  SELECT xr.Adjusted
+    			FROM xrates xr
+    		  WHERE xr.Date <= pd.Date
+    		    AND xr.Currency = pd.SourceCurrency
+    			ORDER BY xr.Date DESC
+    			LIMIT 1
+    		)
+    	END AS PriceUSD
+    FROM price_data pd;
+  "
+)
+
