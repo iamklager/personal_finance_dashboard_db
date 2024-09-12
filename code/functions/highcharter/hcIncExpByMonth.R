@@ -11,8 +11,8 @@ hcIncExpByMonth <- function(df, color = "limegreen", main_currency, darkmode_on)
     )
   }
   
-  df <- aggregate.data.frame(df$Amount, list(df$Category, substr(df$Date, 1, 7)), sum)
-  colnames(df) <- c("Category", "Month", "Amount")
+  df <- aggregate.data.frame(df$Amount, list(substr(df$Date, 1, 7)), sum)
+  colnames(df) <- c("Month", "Amount")
   
   res <- highchart2() |> 
     hc_plotOptions(
@@ -28,7 +28,7 @@ hcIncExpByMonth <- function(df, color = "limegreen", main_currency, darkmode_on)
     ) |>
     hc_xAxis(type = "category") |> 
     hc_yAxis(title = list(text = "Amount")) |> 
-    hc_add_series(data = df, hcaes(x = Month, y = Amount, group = Category), type = "column", color = color) |> 
+    hc_add_series(data = df, hcaes(x = Month, y = Amount), type = "column", color = color) |> 
     hc_legend(enabled = F)
   
   if (darkmode_on) {

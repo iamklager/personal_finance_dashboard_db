@@ -47,6 +47,7 @@ hcPLSources <- function(income, expenses, invested_curves, from, to, main_curren
       )
     ) |> 
     hc_xAxis(type = "category") |> 
+    hc_yAxis(title = list(text = "Amount")) |> 
     hc_add_series(data = df, hcaes(x = Source, y = Amount, group = Source), type = "column")
   
   if (darkmode_on) {

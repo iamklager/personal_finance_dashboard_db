@@ -39,7 +39,7 @@ hcAssetGainCurves <- function(df, type, from, to, darkmode_on) {
       )
     ) |> 
     hc_xAxis(type = "datetime", labels = list(text = "Date")) |> 
-    hc_yAxis(labels = list(text = "Price", format = "{value} %")) |> 
+    hc_yAxis(labels = list(text = "Price", format = "{value} %"), title = list(text = "Change")) |> 
     hc_add_series(data = df, hcaes(x = Date, y = Gain, group = DisplayName), type = "line")
   
   if (darkmode_on) {

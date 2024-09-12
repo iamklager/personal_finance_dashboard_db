@@ -31,7 +31,7 @@ hcInvSumMonth <- function(inv_sums, income, main_currency, darkmode_on) {
   income$Group = "Income"
   inv_sums <- merge(df, inv_sums, by = "Month", all = TRUE)
   colnames(inv_sums)[2] <- "Amount"
-  inv_sums$Group = "InvestedSum"
+  inv_sums$Group = "Investments"
   df <- rbind(income, inv_sums)
   df[is.na(df)] <- 0
   
@@ -48,7 +48,7 @@ hcInvSumMonth <- function(inv_sums, income, main_currency, darkmode_on) {
       )
     ) |> 
     hc_xAxis(type = "category", labels = list(text = "Month")) |> 
-    hc_yAxis(labels = list(text = "Amount")) |> 
+    hc_yAxis(labels = list(text = "Amount"), title = list(text = "Amount")) |> 
     hc_add_series(data = df, hcaes(x = Month, y = Amount, group = Group), type = "column")
   
   if (darkmode_on) {

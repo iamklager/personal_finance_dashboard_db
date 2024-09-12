@@ -29,7 +29,7 @@ nav_Settings <- nav_panel(
     style = "display: inline-flex; border-width: thick; gap: 1.50%;",
     selectizeInput(
       inputId  = "in_DateFormat",
-      label    = "Date format",
+      label    = "Date Format",
       choices  = c("yyyy-mm-dd", "mm/dd/yyyy", "dd.mm.yyyy"),
       selected = dbGetQuery(dbConn, "select DateFormat from settings limit 1;")[[1]]
     ) |> tooltip(l_ToolTips[["DateFormat"]]),

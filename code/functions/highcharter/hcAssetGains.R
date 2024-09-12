@@ -43,7 +43,7 @@ hcAssetGains <- function(df, current_assets, type, from, to, darkmode_on) {
       )
     ) |> 
     hc_xAxis(type = "category", title = list(text = type)) |> 
-    hc_yAxis(labels = list(format = "{value} %")) |> 
+    hc_yAxis(labels = list(format = "{value} %"), title = list(text = "Change")) |> 
     hc_add_series(data = df, hcaes(x = DisplayName, y = Gain, group = Group), type = "column")
   
   if (darkmode_on) {

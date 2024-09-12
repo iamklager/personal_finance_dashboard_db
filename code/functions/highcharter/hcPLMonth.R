@@ -107,7 +107,7 @@ hcPLMonth <- function(income, expenses, invested_curves, from, to, main_currency
       dataSorting = list(enabled = TRUE)
     ) |> 
     hc_xAxis(title = list(text = "Month"), type = "category") |> 
-    hc_yAxis(title = list(text = "Profit/Loss")) |>
+    hc_yAxis(title = list(text = "Amount")) |>
     hc_add_series(
       data = df, hcaes(x = Month, y = Profit), name = "Profit", 
       type = "column", color = col_pos
