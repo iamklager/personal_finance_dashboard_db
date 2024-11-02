@@ -75,9 +75,13 @@ dbSendQuery(
     Volume REAL,
     Adjusted REAL,
     TickerSymbol TEXT NOT NULL,
-    SourceCurrency text NOT NULL
+    SourceCurrency TEXT NOT NULL
   );
   "
+)
+DBI::dbSendStatement(
+  conn = dbConn,
+  statement = "CREATE INDEX IF NOT EXISTS index_price_data ON price_data (Date, TickerSymbol);"
 )
 # All xrates are based on USD. Hence, an entry where Currency = 'EUR' presents the xrate EUR/USD.
 dbSendQuery(
@@ -95,6 +99,10 @@ dbSendQuery(
     Currency text not null
   );
   "
+)
+DBI::dbSendStatement(
+  conn = dbConn,
+  statement = "CREATE INDEX IF NOT EXISTS index_xrates ON xrates (Date, Currency);"
 )
 
 
